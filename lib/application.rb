@@ -82,10 +82,14 @@ end
 
 helpers do
   def import_data(data)
-    if DataImporter.import(data) && revision = Revision.last_imported
-      haml :success, :locals => { :revision => revision }
-    else
-      haml :failure
+    begin
+      if DataImporter.import(data) && revision = Revision.last_imported
+        haml :success, :locals => { :revision => revision }
+      else
+        haml :wat
+      end
+    rescue Exception => e
+      haml :wat
     end
   end
 end
@@ -110,7 +114,7 @@ __END__
 @@layout
 %html
   %head
-    %title This is a title
+    %title Data-Engineering Example
   %body
   = yield
 
@@ -126,12 +130,19 @@ __END__
 
 @@success
 %h1
-  Gross revenue: $#{revision.gross_revenue.to_f}
+  Gross revenue from this import - $#{revision.gross_revenue.to_f}
 %p
   %a{:href => '/'} Import another file?
 
-@@failure
-%h1 There was a problem importing data.
+@@wat
+%div
+  %img(src="http://i1.kym-cdn.com/photos/images/original/000/173/575/25810.jpg" alt="wat")
+%h1 There was a problem importing the data.
+%p Please make sure:
+%ul
+  %li You are uploding a tab-delimited file
+  %li The data in the file is properly formatted
+  %li You have had enough coffee today
 %p
   %a{:href => '/'} Try again?
 
